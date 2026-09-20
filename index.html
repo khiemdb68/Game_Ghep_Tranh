@@ -1,392 +1,369 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cố đọc đi — cùng ghép hình nào!</title>
+  <style>
+    :root {
+      --bg-color: #f1fbf9;
+      --card-bg: #ffffff;
+      --primary: #ff6847;
+      --accent: #117864;
+      --text-dark: #1e3a3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: var(--bg-color);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .header-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 16px 28px;
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+      margin-bottom: 20px;
+    }
+    .badge-tag {
+      background: #ffb703;
+      color: white;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 10px;
+      border-radius: 50%;
+      width: 65px;
+      height: 65px;
+      display: flex;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-text h1 { font-size: 20px; color: #1e3a3a; margin-bottom: 4px; }
+    .header-text p { font-size: 14px; color: #52796f; }
+
+    .main-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 780px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* START SCREEN */
+    .start-screen { width: 100%; max-width: 400px; text-align: center; padding: 20px 0; }
+    .puzzle-icon {
+      width: 50px; height: 50px; background: #e8f8f5; color: #2ec4b6;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; font-size: 24px;
+    }
+    .start-screen h2 { font-size: 22px; margin-bottom: 24px; color: #1f3a44; }
+    .form-group { text-align: left; margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #333; }
+    .form-group input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #d8e2dc;
+      border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;
+    }
+    .form-group input:focus { border-color: var(--primary); }
+    .btn-start {
+      width: 100%; padding: 14px; background: var(--primary);
+      border: none; border-radius: 14px; color: white;
+      font-size: 20px; cursor: pointer; margin-top: 10px; transition: 0.2s;
+    }
+    .btn-start:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* GAMEPLAY SCREEN */
+    .game-screen { display: none; width: 100%; flex-direction: column; align-items: center; }
+    .stats-bar {
+      display: flex; gap: 14px; width: 100%; max-width: 450px; margin-bottom: 16px;
+    }
+    .stat-box {
+      flex: 1; background: #f8faf9; border: 1px solid #e0eae5;
+      border-radius: 12px; padding: 8px 12px; text-align: center;
+    }
+    .stat-title { font-size: 11px; text-transform: uppercase; color: #7f9c96; font-weight: 700; }
+    .stat-val { font-size: 18px; font-weight: bold; color: #222; }
+
+    /* PUZZLE GRID (3 COT x 4 HANG) */
+    #puzzle-grid {
+      width: 420px; height: 672px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 3px;
+      background: #264653;
+      padding: 3px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .piece {
+      width: 100%; height: 100%;
+      background-image: url('https://images2.imgbox.com/7b/03/h7GqI7hW_o.jpg');
+      background-size: 420px 672px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: transform 0.15s, outline 0.15s;
+    }
+    .piece:hover { opacity: 0.92; }
+    .piece.selected {
+      outline: 4px solid #ffb703;
+      transform: scale(0.96);
+      z-index: 10;
+    }
+
+    /* LEADERBOARD / RESULT */
+    .result-screen { display: none; width: 100%; max-width: 520px; text-align: center; }
+    .table-rank { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+    .table-rank th, .table-rank td { padding: 10px 14px; text-align: left; }
+    .table-rank th { background: #e8f5e9; color: #2e7d32; }
+    .table-rank tr:nth-child(even) { background: #fdfdfd; }
+    .table-rank tr:hover { background: #f0fdf4; }
+    .btn-reset {
+      margin-top: 20px; padding: 10px 24px; border-radius: 10px;
+      background: #2a9d8f; color: white; border: none; cursor: pointer; font-size: 14px;
+    }
   </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="vi"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;title&gt;Cố đọc đi — cùng ghép hình nào!&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>:root {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--bg-color: #f1fbf9;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--card-bg: #ffffff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--primary: #ff6847;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--accent: #117864;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--text-dark: #1e3a3a;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: var(--bg-color);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: var(--text-dark);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>flex-direction: column;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>padding: 20px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>min-height: 100vh;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.header-card {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: var(--card-bg);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 20px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>padding: 16px 28px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>max-width: 780px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>gap: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>box-shadow: 0 4px 14px rgba(0,0,0,0.04);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>margin-bottom: 20px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.badge-tag {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: #ffb703;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>font-weight: bold;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>font-size: 13px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>padding: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 65px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>height: 65px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>justify-content: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>flex-shrink: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.header-text h1 { font-size: 20px; color: #1e3a3a; margin-bottom: 4px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.header-text p { font-size: 14px; color: #52796f; }</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.main-card {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: var(--card-bg);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 24px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>padding: 24px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>max-width: 780px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>box-shadow: 0 6px 20px rgba(0,0,0,0.05);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>flex-direction: column;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* START SCREEN */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.start-screen { width: 100%; max-width: 400px; text-align: center; padding: 20px 0; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.puzzle-icon {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 50px; height: 50px; background: #e8f8f5; color: #2ec4b6;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 50%; display: flex; align-items: center; justify-content: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>margin: 0 auto 16px; font-size: 24px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.start-screen h2 { font-size: 22px; margin-bottom: 24px; color: #1f3a44; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.form-group { text-align: left; margin-bottom: 16px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #333; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.form-group input {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100%; padding: 12px 14px; border: 1.5px solid #d8e2dc;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 12px; font-size: 15px; outline: none; transition: 0.2s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.form-group input:focus { border-color: var(--primary); }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-start {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100%; padding: 14px; background: var(--primary);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border: none; border-radius: 14px; color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>font-size: 20px; cursor: pointer; margin-top: 10px; transition: 0.2s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-start:hover { opacity: 0.9; transform: translateY(-1px); }</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* GAMEPLAY SCREEN */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.game-screen { display: none; width: 100%; flex-direction: column; align-items: center; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stats-bar {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: flex; gap: 14px; width: 100%; max-width: 450px; margin-bottom: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-box {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>flex: 1; background: #f8faf9; border: 1px solid #e0eae5;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 12px; padding: 8px 12px; text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-title { font-size: 11px; text-transform: uppercase; color: #7f9c96; font-weight: 700; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-val { font-size: 18px; font-weight: bold; color: #222; }</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* PUZZLE GRID (3 COT x 4 HANG) */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>#puzzle-grid {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 420px; height: 672px; /* Tỉ lệ gần tương đương ảnh cây 7 thói quen */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>display: grid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>grid-template-columns: repeat(3, 1fr);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>grid-template-rows: repeat(4, 1fr);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>gap: 3px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: #264653;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>padding: 3px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 14px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>box-shadow: 0 4px 16px rgba(0,0,0,0.15);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.piece {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100%; height: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background-image: url('https://i.ibb.co/L50Wc5N/cay-7-thoi-quen.jpg'); /* Hoặc đường dẫn ảnh cây */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background-size: 420px 672px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border-radius: 4px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>transition: transform 0.15s, outline 0.15s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.piece:hover { opacity: 0.92; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.piece.selected {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>outline: 4px solid #ffb703;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>transform: scale(0.96);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>z-index: 10;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* LEADERBOARD / RESULT */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.result-screen { display: none; width: 100%; max-width: 520px; text-align: center; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-rank { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-rank th, .table-rank td { padding: 10px 14px; text-align: left; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-rank th { background: #e8f5e9; color: #2e7d32; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-rank tr:nth-child(even) { background: #fdfdfd; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-rank tr:hover { background: #f0fdf4; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-reset {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>margin-top: 20px; padding: 10px 24px; border-radius: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background: #2a9d8f; color: white; border: none; cursor: pointer; font-size: 14px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- HEADER --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="header-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="badge-tag"&gt;12 mảnh ghép&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="header-text"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h1&gt;Cố đọc đi — cùng ghép hình nào!&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p&gt;Quan sát bức tranh, chọn hai mảnh để đổi chỗ và hoàn thành cây 7 Thói Quen.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="main-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- MÀN HÌNH 1: NHẬP THÔNG TIN --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="start-screen" id="startScreen"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="puzzle-icon"&gt;🧩&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2&gt;Sẵn sàng thử tài chưa?&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;label&gt;Tên của nhóm / cá nhân&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="teamName" placeholder="Ví dụ: Nhóm 1 (hoặc Minh Anh)"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;label&gt;Lớp&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="className" placeholder="Ví dụ: 4A"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-start" onclick="startGame()"&gt;▶ Bắt đầu&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- MÀN HÌNH 2: BÀN CHƠI GAME --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="game-screen" id="gameScreen"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="stats-bar"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="stat-box"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-title"&gt;ĐÚNG VỊ TRÍ&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val" id="correctCount"&gt;0/12&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="stat-box"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-title"&gt;LẦN ĐỔI&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val" id="swapCount"&gt;0&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="stat-box"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-title"&gt;THỜI GIAN&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat-val" id="timerVal"&gt;00:00&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="puzzle-grid"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- MÀN HÌNH 3: BẢNG XẾP HẠNG KẾT QUẢ --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="result-screen" id="resultScreen"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2&gt;🎉 Chúc mừng bạn đã hoàn thành!&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p style="color:#52796f; margin-top: 6px;"&gt;Bảng xếp hạng thành tích các nhóm:&lt;/p&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">      </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;table class="table-rank"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;thead&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Hạng&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Tên Nhóm&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Lớp&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Thời gian&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;th&gt;Lần đổi&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/thead&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;tbody id="rankBody"&gt;&lt;/tbody&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/table&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-reset" onclick="resetGame()"&gt;Chơi lại lượt mới&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// CẤU HÌNH TRANH: Lưới 3 x 4 = 12 ô</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const COLS = 3;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const ROWS = 4;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const TOTAL = COLS * ROWS;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const PIECE_W = 420 / COLS; // 140px</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const PIECE_H = 672 / ROWS; // 168px</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Bức tranh cây 7 thói quen bạn đã tải lên (ảnh được nén dạng Base64 hoặc link ảnh trực tiếp)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const IMG_SRC = 'https://images2.imgbox.com/7b/03/h7GqI7hW_o.jpg'; // Ảnh cây 7 thói quen chuẩn tỉ lệ</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let currentOrder = [];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let selectedIdx = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let swaps = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let timer = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let secondsElapsed = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let currentTeam = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let currentClass = "";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function startGame() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const teamInput = document.getElementById('teamName').value.trim();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const classInput = document.getElementById('className').value.trim();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (!teamInput) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>alert("Vui lòng nhập tên nhóm hoặc tên của bạn!");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>currentTeam = teamInput;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>currentClass = classInput || "---";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('startScreen').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('gameScreen').style.display = 'flex';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>initBoard();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>startTimer();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function initBoard() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>swaps = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('swapCount').innerText = swaps;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Tạo mảng thứ tự và xáo trộn ngẫu nhiên</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>currentOrder = Array.from({length: TOTAL}, (_, i) =&gt; i);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>do {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>currentOrder.sort(() =&gt; Math.random() - 0.5);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} while (countCorrect() &gt; 2); // đảm bảo sau khi xáo trộn không bị đúng quá nhiều</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>renderGrid();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>updateStatus();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function renderGrid() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const grid = document.getElementById('puzzle-grid');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>grid.innerHTML = '';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>currentOrder.forEach((posIdx, slotIdx) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const piece = document.createElement('div');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>piece.className = 'piece';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (selectedIdx === slotIdx) piece.classList.add('selected');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Tính toạ độ ảnh của mảnh ban đầu</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const originCol = posIdx % COLS;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const originRow = Math.floor(posIdx / COLS);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>piece.style.backgroundImage = `url('${IMG_SRC}')`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>piece.style.backgroundPosition = `-${originCol * PIECE_W}px -${originRow * PIECE_H}px`;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>piece.onclick = () =&gt; onPieceClick(slotIdx);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>grid.appendChild(piece);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function onPieceClick(slotIdx) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (selectedIdx === null) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>selectedIdx = slotIdx;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderGrid();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} else if (selectedIdx === slotIdx) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>selectedIdx = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderGrid();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} else {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Đổi chỗ hai mảnh</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const temp = currentOrder[selectedIdx];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>currentOrder[selectedIdx] = currentOrder[slotIdx];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>currentOrder[slotIdx] = temp;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>swaps++;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>document.getElementById('swapCount').innerText = swaps;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>selectedIdx = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderGrid();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>updateStatus();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (countCorrect() === TOTAL) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>finishGame();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function countCorrect() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return currentOrder.reduce((acc, curr, idx) =&gt; acc + (curr === idx ? 1 : 0), 0);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function updateStatus() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('correctCount').innerText = `${countCorrect()}/${TOTAL}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function startTimer() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>secondsElapsed = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>clearInterval(timer);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>timer = setInterval(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>secondsElapsed++;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const s = String(secondsElapsed % 60).padStart(2, '0');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>document.getElementById('timerVal').innerText = `${m}:${s}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}, 1000);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function finishGame() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>clearInterval(timer);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>setTimeout(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>saveResult();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>showLeaderboard();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}, 400);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function saveResult() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const results = JSON.parse(localStorage.getItem('puzzle_leaderboard') || '[]');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>results.push({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>name: currentTeam,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>class: currentClass,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>time: secondsElapsed,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>swaps: swaps,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>date: new Date().toLocaleTimeString()</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Sắp xếp: Ưu tiên thời gian ít hơn, nếu bằng nhau xét ít lần đổi hơn</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>results.sort((a, b) =&gt; a.time - b.time || a.swaps - b.swaps);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>localStorage.setItem('puzzle_leaderboard', JSON.stringify(results));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function showLeaderboard() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('gameScreen').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('resultScreen').style.display = 'block';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const results = JSON.parse(localStorage.getItem('puzzle_leaderboard') || '[]');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const tbody = document.getElementById('rankBody');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>tbody.innerHTML = '';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>results.forEach((r, idx) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const m = String(Math.floor(r.time / 60)).padStart(2, '0');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const s = String(r.time % 60).padStart(2, '0');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const tr = document.createElement('tr');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>tr.innerHTML = `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td&gt;&lt;strong&gt;#${idx + 1}&lt;/strong&gt;&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td&gt;${r.name}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td&gt;${r.class}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td&gt;${m}:${s}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td&gt;${r.swaps} lần&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>tbody.appendChild(tr);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>function resetGame() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('resultScreen').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('startScreen').style.display = 'block';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="badge-tag">12 mảnh ghép</div>
+    <div class="header-text">
+      <h1>Cố đọc đi — cùng ghép hình nào!</h1>
+      <p>Quan sát bức tranh, chọn hai mảnh để đổi chỗ và hoàn thành cây 7 Thói Quen.</p>
+    </div>
+  </div>
+
+  <div class="main-card">
+    <!-- MÀN HÌNH 1: NHẬP THÔNG TIN -->
+    <div class="start-screen" id="startScreen">
+      <div class="puzzle-icon">🧩</div>
+      <h2>Sẵn sàng thử tài chưa?</h2>
+      <div class="form-group">
+        <label>Tên của nhóm / cá nhân</label>
+        <input type="text" id="teamName" placeholder="Ví dụ: Nhóm 1 (hoặc Minh Anh)">
+      </div>
+      <div class="form-group">
+        <label>Lớp</label>
+        <input type="text" id="className" placeholder="Ví dụ: 4A">
+      </div>
+      <button class="btn-start" onclick="startGame()">▶ Bắt đầu</button>
+    </div>
+
+    <!-- MÀN HÌNH 2: BÀN CHƠI GAME -->
+    <div class="game-screen" id="gameScreen">
+      <div class="stats-bar">
+        <div class="stat-box">
+          <div class="stat-title">ĐÚNG VỊ TRÍ</div>
+          <div class="stat-val" id="correctCount">0/12</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-title">LẦN ĐỔI</div>
+          <div class="stat-val" id="swapCount">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-title">THỜI GIAN</div>
+          <div class="stat-val" id="timerVal">00:00</div>
+        </div>
+      </div>
+
+      <div id="puzzle-grid"></div>
+    </div>
+
+    <!-- MÀN HÌNH 3: BẢNG XẾP HẠNG KẾT QUẢ -->
+    <div class="result-screen" id="resultScreen">
+      <h2>🎉 Chúc mừng bạn đã hoàn thành!</h2>
+      <p style="color:#52796f; margin-top: 6px;">Bảng xếp hạng thành tích các nhóm:</p>
+      
+      <table class="table-rank">
+        <thead>
+          <tr>
+            <th>Hạng</th>
+            <th>Tên Nhóm</th>
+            <th>Lớp</th>
+            <th>Thời gian</th>
+            <th>Lần đổi</th>
+          </tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+
+      <button class="btn-reset" onclick="resetGame()">Chơi lại lượt mới</button>
+    </div>
+  </div>
+
+<script>
+  const COLS = 3;
+  const ROWS = 4;
+  const TOTAL = COLS * ROWS;
+  const PIECE_W = 420 / COLS;
+  const PIECE_H = 672 / ROWS;
+
+  const IMG_SRC = 'https://images2.imgbox.com/7b/03/h7GqI7hW_o.jpg';
+
+  let currentOrder = [];
+  let selectedIdx = null;
+  let swaps = 0;
+  let timer = null;
+  let secondsElapsed = 0;
+  let currentTeam = "";
+  let currentClass = "";
+
+  function startGame() {
+    const teamInput = document.getElementById('teamName').value.trim();
+    const classInput = document.getElementById('className').value.trim();
+    if (!teamInput) {
+      alert("Vui lòng nhập tên nhóm hoặc tên của bạn!");
+      return;
+    }
+    currentTeam = teamInput;
+    currentClass = classInput || "---";
+
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'flex';
+
+    initBoard();
+    startTimer();
+  }
+
+  function initBoard() {
+    swaps = 0;
+    document.getElementById('swapCount').innerText = swaps;
+    
+    currentOrder = Array.from({length: TOTAL}, (_, i) => i);
+    do {
+      currentOrder.sort(() => Math.random() - 0.5);
+    } while (countCorrect() > 2);
+
+    renderGrid();
+    updateStatus();
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('puzzle-grid');
+    grid.innerHTML = '';
+
+    currentOrder.forEach((posIdx, slotIdx) => {
+      const piece = document.createElement('div');
+      piece.className = 'piece';
+      if (selectedIdx === slotIdx) piece.classList.add('selected');
+
+      const originCol = posIdx % COLS;
+      const originRow = Math.floor(posIdx / COLS);
+      piece.style.backgroundImage = `url('${IMG_SRC}')`;
+      piece.style.backgroundPosition = `-${originCol * PIECE_W}px -${originRow * PIECE_H}px`;
+
+      piece.onclick = () => onPieceClick(slotIdx);
+      grid.appendChild(piece);
+    });
+  }
+
+  function onPieceClick(slotIdx) {
+    if (selectedIdx === null) {
+      selectedIdx = slotIdx;
+      renderGrid();
+    } else if (selectedIdx === slotIdx) {
+      selectedIdx = null;
+      renderGrid();
+    } else {
+      const temp = currentOrder[selectedIdx];
+      currentOrder[selectedIdx] = currentOrder[slotIdx];
+      currentOrder[slotIdx] = temp;
+
+      swaps++;
+      document.getElementById('swapCount').innerText = swaps;
+      selectedIdx = null;
+      renderGrid();
+      updateStatus();
+
+      if (countCorrect() === TOTAL) {
+        finishGame();
+      }
+    }
+  }
+
+  function countCorrect() {
+    return currentOrder.reduce((acc, curr, idx) => acc + (curr === idx ? 1 : 0), 0);
+  }
+
+  function updateStatus() {
+    document.getElementById('correctCount').innerText = `${countCorrect()}/${TOTAL}`;
+  }
+
+  function startTimer() {
+    secondsElapsed = 0;
+    clearInterval(timer);
+    timer = setInterval(() => {
+      secondsElapsed++;
+      const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const s = String(secondsElapsed % 60).padStart(2, '0');
+      document.getElementById('timerVal').innerText = `${m}:${s}`;
+    }, 1000);
+  }
+
+  function finishGame() {
+    clearInterval(timer);
+    setTimeout(() => {
+      saveResult();
+      showLeaderboard();
+    }, 400);
+  }
+
+  function saveResult() {
+    const results = JSON.parse(localStorage.getItem('puzzle_leaderboard') || '[]');
+    results.push({
+      name: currentTeam,
+      class: currentClass,
+      time: secondsElapsed,
+      swaps: swaps,
+      date: new Date().toLocaleTimeString()
+    });
+    results.sort((a, b) => a.time - b.time || a.swaps - b.swaps);
+    localStorage.setItem('puzzle_leaderboard', JSON.stringify(results));
+  }
+
+  function showLeaderboard() {
+    document.getElementById('gameScreen').style.display = 'none';
+    document.getElementById('resultScreen').style.display = 'block';
+
+    const results = JSON.parse(localStorage.getItem('puzzle_leaderboard') || '[]');
+    const tbody = document.getElementById('rankBody');
+    tbody.innerHTML = '';
+
+    results.forEach((r, idx) => {
+      const m = String(Math.floor(r.time / 60)).padStart(2, '0');
+      const s = String(r.time % 60).padStart(2, '0');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>#${idx + 1}</strong></td>
+        <td>${r.name}</td>
+        <td>${r.class}</td>
+        <td>${m}:${s}</td>
+        <td>${r.swaps} lần</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function resetGame() {
+    document.getElementById('resultScreen').style.display = 'none';
+    document.getElementById('startScreen').style.display = 'block';
+  }
+</script>
 </body>
 </html>
